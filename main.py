@@ -13,19 +13,19 @@ class Steganography:
 
     def _merge_rgb(self, rgb1, rgb2, rgb3, rgb4, rgb_sm):
 
-        r1, g1, b1 = int_to_bin(rgb1)
-        r2, g2, b2 = int_to_bin(rgb2)
-        r3, g3, b3 = int_to_bin(rgb3)
-        r4, g4, b4 = int_to_bin(rgb4)
-        r_sm, g_sm, b_sm = int_to_bin(rgb_sm)
+        r1, g1, b1 = int_to_bin_arr(rgb1)
+        r2, g2, b2 = int_to_bin_arr(rgb2)
+        r3, g3, b3 = int_to_bin_arr(rgb3)
+        r4, g4, b4 = int_to_bin_arr(rgb4)
+        r_sm, g_sm, b_sm = int_to_bin_arr(rgb_sm)
 
-        container_r = np.array(str_to_arr(r1[-3:] + r2[-4:] + r3[-4:] + r4[-4:]))
-        container_g = np.array(str_to_arr(g1[-3:] + g2[-4:] + g3[-4:] + g4[-4:]))
-        container_b = np.array(str_to_arr(b1[-3:] + b2[-4:] + b3[-4:] + b4[-4:]))
+        container_r = np.array(r1[-3:] + r2[-4:] + r3[-4:] + r4[-4:])
+        container_g = np.array(g1[-3:] + g2[-4:] + g3[-4:] + g4[-4:])
+        container_b = np.array(b1[-3:] + b2[-4:] + b3[-4:] + b4[-4:])
 
-        m_r = np.array(str_to_arr(r_sm[:4]))
-        m_g = np.array(str_to_arr(g_sm[:4]))
-        m_b = np.array(str_to_arr(b_sm[:4]))
+        m_r = np.array(r_sm[:4])
+        m_g = np.array(g_sm[:4])
+        m_b = np.array(b_sm[:4])
 
         mul_rh = matr_to_bin(np.dot(self.H, container_r))
         mul_gh = matr_to_bin(np.dot(self.H, container_g))
@@ -35,39 +35,38 @@ class Steganography:
         sub_g = matr_to_bin(m_g - mul_gh)
         sub_b = matr_to_bin(m_b - mul_bh)
 
-        cont_r = arr_to_str(set_bit(container_r, get_ind(sub_r)))
-        cont_g = arr_to_str(set_bit(container_g, get_ind(sub_g)))
-        cont_b = arr_to_str(set_bit(container_b, get_ind(sub_b)))
+        cont_r = set_bit(container_r, get_ind(sub_r))
+        cont_g = set_bit(container_g, get_ind(sub_g))
+        cont_b = set_bit(container_b, get_ind(sub_b))
 
-        nr1, nr2, nr3, nr4 = r1[:5] + cont_r[0:3], r2[:4] + cont_r[3:7], r3[:4] + cont_r[7:11], r4[:4] + cont_r[11:]
-        ng1, ng2, ng3, ng4 = g1[:5] + cont_g[0:3], g2[:4] + cont_g[3:7], g3[:4] + cont_g[7:11], g4[:4] + cont_g[11:]
-        nb1, nb2, nb3, nb4 = b1[:5] + cont_b[0:3], b2[:4] + cont_b[3:7], b3[:4] + cont_b[7:11], b4[:4] + cont_b[11:]
+        nr1, nr2, nr3, nr4 = np.concatenate((r1[:5], cont_r[0:3])), np.concatenate((r2[:4], cont_r[3:7])), np.concatenate((r3[:4], cont_r[7:11])), np.concatenate((r4[:4], cont_r[11:]))
+        ng1, ng2, ng3, ng4 = np.concatenate((g1[:5], cont_g[0:3])), np.concatenate((g2[:4], cont_g[3:7])), np.concatenate((g3[:4], cont_g[7:11])), np.concatenate((g4[:4], cont_g[11:]))
+        nb1, nb2, nb3, nb4 = np.concatenate((b1[:5], cont_b[0:3])), np.concatenate((b2[:4], cont_b[3:7])), np.concatenate((b3[:4], cont_b[7:11])), np.concatenate((b4[:4], cont_b[11:]))
 
         rgb1 = nr1, ng1, nb1
         rgb2 = nr2, ng2, nb2
         rgb3 = nr3, ng3, nb3
         rgb4 = nr4, ng4, nb4
 
-        res = [bin_to_int(rgb1), bin_to_int(rgb2), bin_to_int(rgb3), bin_to_int(rgb4)]
 
-        return res
+        return [bin_to_int(rgb1), bin_to_int(rgb2), bin_to_int(rgb3), bin_to_int(rgb4)]
 
     def _unmerge_rgb(self, rgb1, rgb2, rgb3, rgb4):
 
-        r1, g1, b1 = int_to_bin(rgb1)
-        r2, g2, b2 = int_to_bin(rgb2)
-        r3, g3, b3 = int_to_bin(rgb3)
-        r4, g4, b4 = int_to_bin(rgb4)
+        r1, g1, b1 = int_to_bin_arr(rgb1)
+        r2, g2, b2 = int_to_bin_arr(rgb2)
+        r3, g3, b3 = int_to_bin_arr(rgb3)
+        r4, g4, b4 = int_to_bin_arr(rgb4)
 
-        container_r = np.array(str_to_arr(r1[-3:] + r2[-4:] + r3[-4:] + r4[-4:]))
-        container_g = np.array(str_to_arr(g1[-3:] + g2[-4:] + g3[-4:] + g4[-4:]))
-        container_b = np.array(str_to_arr(b1[-3:] + b2[-4:] + b3[-4:] + b4[-4:]))
+        container_r = np.array(r1[-3:] + r2[-4:] + r3[-4:] + r4[-4:])
+        container_g = np.array(g1[-3:] + g2[-4:] + g3[-4:] + g4[-4:])
+        container_b = np.array(b1[-3:] + b2[-4:] + b3[-4:] + b4[-4:])
 
-        mul_rh = arr_to_str(matr_to_bin(np.dot(self.H, container_r)))
-        mul_gh = arr_to_str(matr_to_bin(np.dot(self.H, container_g)))
-        mul_bh = arr_to_str(matr_to_bin(np.dot(self.H, container_b)))
+        mul_rh = matr_to_bin(np.dot(self.H, container_r))
+        mul_gh = matr_to_bin(np.dot(self.H, container_g))
+        mul_bh = matr_to_bin(np.dot(self.H, container_b))
 
-        rgb = mul_rh + "0000", mul_gh + "0000", mul_bh + "0000"
+        rgb = np.concatenate((mul_rh, [0,0,0,0])), np.concatenate((mul_gh, [0,0,0,0])), np.concatenate((mul_bh, [0,0,0,0]))
 
         return bin_to_int(rgb)
 
@@ -84,19 +83,19 @@ class Steganography:
 
         i_sm = 0
         j_sm = 0
-        for i in range(image1.size[0]):
-            for j in range(0, image1.size[1] - 4, 4):
+        for i in range(0, image1.size[0] - 1, 2):
+            for j in range(0, image1.size[1] - 1, 2):
                 is_valid = lambda: i_sm < image2.size[0] and j_sm < image2.size[1]
                 rgb1 = map1[i, j]
-                rgb2 = map1[i, j + 1]
-                rgb3 = map1[i, j + 2]
-                rgb4 = map1[i, j + 3]
+                rgb2 = map1[i + 1, j]
+                rgb3 = map1[i, j + 1]
+                rgb4 = map1[i + 1, j + 1]
                 rgb_sm = map2[i_sm, j_sm] if is_valid() else self.BLACK_PIXEL
                 rgb_arr = self._merge_rgb(rgb1, rgb2, rgb3, rgb4, rgb_sm)
                 new_map[i, j] = rgb_arr[0]
-                new_map[i, j + 1] = rgb_arr[1]
-                new_map[i, j + 2] = rgb_arr[2]
-                new_map[i, j + 3] = rgb_arr[3]
+                new_map[i + 1, j] = rgb_arr[1]
+                new_map[i, j + 1] = rgb_arr[2]
+                new_map[i + 1, j + 1] = rgb_arr[3]
                 j_sm += 1
             j_sm = 0
             i_sm += 1
@@ -109,11 +108,11 @@ class Steganography:
         new_map = new_image.load()
         i_sm = 0
         j_sm = 0
-        for i in range(image.size[0]):
-            for j in range(0, image.size[1] - 4, 4):
-                new_map[i_sm, j_sm] = self._unmerge_rgb(pixel_map[i, j], pixel_map[i, j + 1],
-                                                        pixel_map[i, j + 2],
-                                                        pixel_map[i, j + 3])
+        for i in range(0, image.size[0] - 1, 2):
+            for j in range(0, image.size[1] - 1, 2):
+                new_map[i_sm, j_sm] = self._unmerge_rgb(pixel_map[i, j], pixel_map[i + 1, j],
+                                                        pixel_map[i, j + 1],
+                                                        pixel_map[i + 1, j + 1])
                 j_sm += 1
             i_sm += 1
             j_sm = 0
@@ -212,7 +211,7 @@ def main():
             print("Picture was not found")
             exit()
 
-        print("What algorithm to use for decoding?\r\n1. Hemming.\r\n2. Simple")
+        print("What algorithm to use for decoding?\r\n1. Hamming.\r\n2. Simple.")
         tp = input("My choice is: ")
         print("Ok, what will be the name of the decrypted file?")
         s_image = input("Name: ")
@@ -233,3 +232,6 @@ def main():
 if __name__ == '__main__':
     main()
     input()
+
+
+
