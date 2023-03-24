@@ -2,7 +2,6 @@ from PIL import Image
 from matrix_things import *
 
 import numpy as np
-import argparse
 
 
 class Steganography:
